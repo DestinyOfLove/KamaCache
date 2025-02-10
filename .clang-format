@@ -1,0 +1,19 @@
+BasedOnStyle: Google
+---
+Language: Cpp
+ColumnLimit: 120
+IncludeBlocks: Regroup
+BreakBeforeBraces: Attach # 先括号再换行
+SeparateDefinitionBlocks: Always #定义用行分离
+BinPackArguments: false # 参数调用打包，尽可能一行
+BinPackParameters: false # 参数声明打包，尽可能一行
+AlignAfterOpenBracket: Align # 参数对齐
+AlignTrailingComments: true #注释对齐
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortEnumsOnASingleLine: false
+FixNamespaceComments: true # 命名空间注释
+AlwaysBreakTemplateDeclarations: Yes # 模板声明换行
+BreakBeforeBinaryOperators: All
+TabWidth: 4
+IndentWidth: 4
+AccessModifierOffset: -4 # public protected private 修饰符不缩进
