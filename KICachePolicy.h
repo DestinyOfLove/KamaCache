@@ -1,11 +1,9 @@
 #pragma once
 
-namespace KamaCache
-{
+namespace KamaCache {
 
 template <typename Key, typename Value>
-class KICachePolicy
-{
+class KICachePolicy {
 public:
     virtual ~KICachePolicy() {};
 
@@ -16,7 +14,6 @@ public:
     virtual bool get(Key key, Value& value) = 0;
     // 如果缓存中能找到key，则直接返回value
     virtual Value get(Key key) = 0;
-
 };
 
-} // namespace KamaCache
+}  // namespace KamaCache

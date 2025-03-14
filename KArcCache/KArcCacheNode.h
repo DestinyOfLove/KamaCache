@@ -2,12 +2,10 @@
 
 #include <memory>
 
-namespace KamaCache 
-{
+namespace KamaCache {
 
-template<typename Key, typename Value>
-class ArcNode 
-{
+template <typename Key, typename Value>
+class ArcNode {
 private:
     Key key_;
     Value value_;
@@ -17,26 +15,25 @@ private:
 
 public:
     ArcNode() : accessCount_(1), prev_(nullptr), next_(nullptr) {}
-    
-    ArcNode(Key key, Value value) 
-        : key_(key)
-        , value_(value)
-        , accessCount_(1)
-        , prev_(nullptr)
-        , next_(nullptr) 
-    {}
+
+    ArcNode(Key key, Value value) : key_(key), value_(value), accessCount_(1), prev_(nullptr), next_(nullptr) {}
 
     // Getters
     Key getKey() const { return key_; }
+
     Value getValue() const { return value_; }
+
     size_t getAccessCount() const { return accessCount_; }
-    
+
     // Setters
     void setValue(const Value& value) { value_ = value; }
+
     void incrementAccessCount() { ++accessCount_; }
 
-    template<typename K, typename V> friend class ArcLruPart;
-    template<typename K, typename V> friend class ArcLfuPart;
+    template <typename K, typename V>
+    friend class ArcLruPart;
+    template <typename K, typename V>
+    friend class ArcLfuPart;
 };
 
-} // namespace KamaCache
+}  // namespace KamaCache

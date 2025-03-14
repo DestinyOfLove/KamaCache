@@ -1,20 +1,20 @@
-#include <iostream>
-#include <string>
-#include <chrono>
-#include <vector>
-#include <iomanip>
-#include <random>
 #include <algorithm>
+#include <chrono>
+#include <iomanip>
+#include <iostream>
+#include <random>
+#include <string>
+#include <vector>
 
+#include "KArcCache/KArcCache.h"
 #include "KICachePolicy.h"
 #include "KLfuCache.h"
 #include "KLruCache.h"
-#include "KArcCache/KArcCache.h"
 
 class Timer {
 public:
     Timer() : start_(std::chrono::high_resolution_clock::now()) {}
-    
+
     double elapsed() {
         auto now = std::chrono::high_resolution_clock::now();
         return std::chrono::duration_cast<std::chrono::milliseconds>(now - start_).count();
@@ -25,33 +25,34 @@ private:
 };
 
 // 辅助函数：打印结果
-void printResults(const std::string& testName, int capacity, 
-                 const std::vector<int>& get_operations, 
-                 const std::vector<int>& hits) {
+void printResults(const std::string& testName,
+                  int capacity,
+                  const std::vector<int>& get_operations,
+                  const std::vector<int>& hits) {
     std::cout << "缓存大小: " << capacity << std::endl;
-    std::cout << "LRU - 命中率: " << std::fixed << std::setprecision(2) 
-              << (100.0 * hits[0] / get_operations[0]) << "%" << std::endl;
-    std::cout << "LFU - 命中率: " << std::fixed << std::setprecision(2) 
-              << (100.0 * hits[1] / get_operations[1]) << "%" << std::endl;
-    std::cout << "ARC - 命中率: " << std::fixed << std::setprecision(2) 
-              << (100.0 * hits[2] / get_operations[2]) << "%" << std::endl;
+    std::cout << "LRU - 命中率: " << std::fixed << std::setprecision(2) << (100.0 * hits[0] / get_operations[0]) << "%"
+              << std::endl;
+    std::cout << "LFU - 命中率: " << std::fixed << std::setprecision(2) << (100.0 * hits[1] / get_operations[1]) << "%"
+              << std::endl;
+    std::cout << "ARC - 命中率: " << std::fixed << std::setprecision(2) << (100.0 * hits[2] / get_operations[2]) << "%"
+              << std::endl;
 }
 
 void testHotDataAccess() {
     std::cout << "\n=== 测试场景1：热点数据访问测试 ===" << std::endl;
-    
-    const int CAPACITY = 50;  // 增加缓存容量
+
+    const int CAPACITY = 50;        // 增加缓存容量
     const int OPERATIONS = 500000;  // 增加操作次数
-    const int HOT_KEYS = 20;   // 增加热点数据的数量
-    const int COLD_KEYS = 5000;        
-    
+    const int HOT_KEYS = 20;        // 增加热点数据的数量
+    const int COLD_KEYS = 5000;
+
     KamaCache::KLruCache<int, std::string> lru(CAPACITY);
     KamaCache::KLfuCache<int, std::string> lfu(CAPACITY);
     KamaCache::KArcCache<int, std::string> arc(CAPACITY);
 
     std::random_device rd;
     std::mt19937 gen(rd());
-    
+
     std::array<KamaCache::KICachePolicy<int, std::string>*, 3> caches = {&lru, &lfu, &arc};
     std::vector<int> hits(3, 0);
     std::vector<int> get_operations(3, 0);
@@ -68,7 +69,7 @@ void testHotDataAccess() {
             std::string value = "value" + std::to_string(key);
             caches[i]->put(key, value);
         }
-        
+
         // 然后进行随机get操作
         for (int get_op = 0; get_op < OPERATIONS; ++get_op) {
             int key;
@@ -77,7 +78,7 @@ void testHotDataAccess() {
             } else {  // 30%概率访问冷数据
                 key = HOT_KEYS + (gen() % COLD_KEYS);
             }
-            
+
             std::string result;
             get_operations[i]++;
             if (caches[i]->get(key, result)) {
@@ -91,11 +92,11 @@ void testHotDataAccess() {
 
 void testLoopPattern() {
     std::cout << "\n=== 测试场景2：循环扫描测试 ===" << std::endl;
-    
+
     const int CAPACITY = 50;  // 增加缓存容量
-    const int LOOP_SIZE = 500;         
+    const int LOOP_SIZE = 500;
     const int OPERATIONS = 200000;  // 增加操作次数
-    
+
     KamaCache::KLruCache<int, std::string> lru(CAPACITY);
     KamaCache::KLfuCache<int, std::string> lfu(CAPACITY);
     KamaCache::KArcCache<int, std::string> arc(CAPACITY);
@@ -113,7 +114,7 @@ void testLoopPattern() {
             std::string value = "loop" + std::to_string(key);
             caches[i]->put(key, value);
         }
-        
+
         // 然后进行访问测试
         int current_pos = 0;
         for (int op = 0; op < OPERATIONS; ++op) {
@@ -126,7 +127,7 @@ void testLoopPattern() {
             } else {  // 10%访问范围外数据
                 key = LOOP_SIZE + (gen() % LOOP_SIZE);
             }
-            
+
             std::string result;
             get_operations[i]++;
             if (caches[i]->get(key, result)) {
@@ -140,11 +141,11 @@ void testLoopPattern() {
 
 void testWorkloadShift() {
     std::cout << "\n=== 测试场景3：工作负载剧烈变化测试 ===" << std::endl;
-    
-    const int CAPACITY = 4;            
-    const int OPERATIONS = 80000;      
+
+    const int CAPACITY = 4;
+    const int OPERATIONS = 80000;
     const int PHASE_LENGTH = OPERATIONS / 5;
-    
+
     KamaCache::KLruCache<int, std::string> lru(CAPACITY);
     KamaCache::KLfuCache<int, std::string> lfu(CAPACITY);
     KamaCache::KArcCache<int, std::string> arc(CAPACITY);
@@ -161,7 +162,7 @@ void testWorkloadShift() {
             std::string value = "init" + std::to_string(key);
             caches[i]->put(key, value);
         }
-        
+
         // 然后进行多阶段测试
         for (int op = 0; op < OPERATIONS; ++op) {
             int key;
@@ -185,13 +186,13 @@ void testWorkloadShift() {
                     key = 100 + (gen() % 900);
                 }
             }
-            
+
             std::string result;
             get_operations[i]++;
             if (caches[i]->get(key, result)) {
                 hits[i]++;
             }
-            
+
             // 随机进行put操作，更新缓存内容
             if (gen() % 100 < 30) {  // 30%概率进行put
                 std::string value = "new" + std::to_string(key);
