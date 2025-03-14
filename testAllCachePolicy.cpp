@@ -1,5 +1,3 @@
-#include <algorithm>
-#include <chrono>
 #include <iomanip>
 #include <iostream>
 #include <random>
@@ -10,19 +8,6 @@
 #include "KICachePolicy.h"
 #include "KLfuCache.h"
 #include "KLruCache.h"
-
-class Timer {
-public:
-    Timer() : start_(std::chrono::high_resolution_clock::now()) {}
-
-    double elapsed() {
-        auto now = std::chrono::high_resolution_clock::now();
-        return std::chrono::duration_cast<std::chrono::milliseconds>(now - start_).count();
-    }
-
-private:
-    std::chrono::time_point<std::chrono::high_resolution_clock> start_;
-};
 
 // 辅助函数：打印结果
 void printResults(const std::string& testName,
