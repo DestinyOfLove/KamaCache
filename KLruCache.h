@@ -158,8 +158,7 @@ template <typename Key, typename Value>
 class KLruKCache : public KLruCache<Key, Value> {
 public:
     KLruKCache(int capacity, int historyCapacity, int k)
-        : KLruCache<Key, Value>(capacity)  // 调用基类构造
-          ,
+        : KLruCache<Key, Value>(capacity),  // 调用基类构造
           historyList_(std::make_unique<KLruCache<Key, size_t>>(historyCapacity)),
           k_(k) {}
 
@@ -182,7 +181,7 @@ public:
         historyList_->put(key, ++historyCount);
 
         if (historyCount >= k_) {
-            // 移除历史访问记录
+            // 移除历史访问记录。如果不移除的话，热点数据的historyCount会一直增加直到溢出
             historyList_->remove(key);
             // 添加入缓存中
             KLruCache<Key, Value>::put(key, value);
@@ -220,7 +219,6 @@ public:
 
     Value get(Key key) {
         Value value;
-        memset(&value, 0, sizeof(value));
         get(key, value);
         return value;
     }
